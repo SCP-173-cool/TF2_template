@@ -15,6 +15,7 @@ import numpy as np
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
 
+from tqdm import tqdm
 
 ## DATASETS SETTING
 mnist = tf.keras.datasets.mnist
@@ -52,9 +53,11 @@ optimizer = tf.keras.optimizers.Adam()
 
 class METRICS(object):
     
+    ## Train process Metrics
     train_loss = tf.keras.metrics.Mean(name="train_loss")
     train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="train_accuracy")
     
+    ## Train process Metrics
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
 
@@ -78,7 +81,7 @@ def test_step(images, labels):
     METRICS.test_accuracy(labels, predictions)
     
 EPOCHS=5
-for epoch in range(EPOCHS):
+for epoch in tqdm(range(EPOCHS)):
     for images, labels in train_ds:
         train_step(images, labels)
     for test_images, test_labels in test_ds:
