@@ -107,6 +107,7 @@ All_datasets = (train_ds, valid_ds)
 if __name__ == "__main__":
     """
     """
+    from tqdm import tqdm
     train_tfrecord_lst = ['./tools/train.tfrecord']
     train_ds = data_loader(train_tfrecord_lst, 
                            shuffle=True, 
@@ -114,30 +115,16 @@ if __name__ == "__main__":
                            process_func=train_process_func,
                            num_processors=8)
 
-    for images, labels in train_ds:
+    for images, labels in tqdm(train_ds):
         pass
 
     images = images.numpy()
     print(images.shape)
 
     import matplotlib.pyplot as plt
+    images = (images + 1) / 2.
     for i in range(len(images)):
         image = images[i]
         plt.imshow(image)
         plt.show()
 
-
-"""
-mnist = tf.keras.datasets.mnist
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255., x_test / 255.
-
-x_train = x_train[..., np.newaxis]
-x_test = x_test[..., np.newaxis]
-
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-train_ds = train_ds.shuffle(10000).batch(32)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
-
-All_datasets = (train_ds, test_ds)
-"""

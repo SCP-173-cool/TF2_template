@@ -104,7 +104,7 @@ if __name__ == "__main__":
     ROOT_DIR = "/home/loktarxiao/Datasets/dogs_vs_cats/"
     train_lst = []
     valid_lst = []
-    with open(os.path.join(ROOT_DIR, "message_lst.csv")) as fp:
+    with open(os.path.join("./", "message_lst.csv")) as fp:
         messages = fp.readlines()
     print(messages[:3])
     for i in messages:

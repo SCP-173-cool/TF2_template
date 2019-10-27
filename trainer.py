@@ -23,6 +23,21 @@ class Trainer(object):
 
         self.train_variables = self.model.trainable_variables
 
+    def _compile(self):
+        """
+        """
+        self.model.compile(optimizer=self.opts.OPTIMIZER,
+                           loss=self.opts.LOSS_FUNC,
+                           metrics=self.mets.METRICS_LST)
+    
+    def train(self):
+        """
+        """
+        self.model.fit(self.train_ds, 
+                       epochs=self.cfgs.EPOCHS,
+                       validation_data=self.valid_ds)
+    
+    """
     #@tf.function
     def train_step(self, images, labels):
         with tf.GradientTape() as tape:
@@ -65,3 +80,4 @@ class Trainer(object):
 
             self.mets.reset_all_metrics()
 
+    """

@@ -27,4 +27,5 @@ if __name__ == "__main__":
     optimizers  = Optimizers()
     trainer     = Trainer(datasets, model, config, metrics, optimizers)
 
-    trainer.run_loop()
+    trainer._compile()
+    trainer.train()
