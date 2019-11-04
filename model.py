@@ -75,7 +75,7 @@ def residual_block(input_tensor, block_type, n_filters):
     return x
 
 
-def ResNet34(input_shape=[None, None, 3], num_classes=1000, include_top=True, return_endpoints=False):
+def ResNet34(input_shape=[None, None, 3], num_classes=1000, include_top=True):
     input_tensor = tf.keras.layers.Input(shape=input_shape)
     x = tf.keras.layers.Conv2D(filters=64,
                                kernel_size=7,
@@ -100,7 +100,8 @@ def ResNet34(input_shape=[None, None, 3], num_classes=1000, include_top=True, re
                 x = residual_block(input_tensor=x,
                                    block_type='identity',
                                    n_filters=n_filters)
+    x = tf.keras.layers.Dropout(0.3)(x)
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     if include_top:
-        x = tf.keras.layers.Dense(units=num_classes)(x)
+        x = tf.keras.layers.Dense(units=num_classes, activation="softmax")(x)
     return tf.keras.Model(inputs=input_tensor, outputs=x, name='ResNet34')

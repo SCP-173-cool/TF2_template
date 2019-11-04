@@ -20,7 +20,7 @@ from data import All_datasets
 
 if __name__ == "__main__":
     
-    model       = ResNet34(input_shape=[224, 224, 3], num_classes=2, include_top=True, return_endpoints=False)
+    model       = ResNet34(input_shape=[224, 224, 3], num_classes=2, include_top=True)
     datasets    = All_datasets
     config      = MNIST_config()
     metrics     = Metrics()

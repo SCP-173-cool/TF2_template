@@ -7,8 +7,6 @@ Created on Mon Sep  2 11:24:34 2019
 """
 import sys
 sys.dont_write_bytecode = True
-sys.path.append("../")
-
 
 import os
 import cv2
@@ -21,7 +19,8 @@ from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 
-from utils import image_read, resize_shorter_edge
+from img_utils import image_read, resize_shorter_edge
+
 
 def _int64_feature(value):
     """Conver integer data to a string which is accepted by tensorflow record.
@@ -34,47 +33,42 @@ def _bytes_feature(value):
     """
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
 
-def tfrecord_string(image, label):
+def _tfrecord_string(feature):
     """Convert image array and label message to tensorflow serialized string.
     Args:
-        image(numpy.array): image array read by opencv/scipy.misc/skimage.io/PIL.Image
-                            in RGB order.
-        label(int): the class of `image` which starts with `0`.
-
+        feature: tensorflow features from messages
     Returns:
         tf_serialized: tensorflow serialized string message matched by `TFRECORD`.
     """
+    tf_features = tf.train.Features(feature=feature)
+    example = tf.train.Example(features=tf_features)
+    tf_serialized = example.SerializeToString()
+    return tf_serialized
+
+def MessageProcess(item):
+    image_path, label = item[0], item[1]
+    image = image_read(image_path)
+    image = resize_shorter_edge(image, size=250)
 
     feature = {
         'label': _int64_feature([label]),
         'image': _bytes_feature([image.tobytes()]),
         'image_shape': _int64_feature(list(image.shape))
     }
-    tf_features = tf.train.Features(feature=feature)
-    example = tf.train.Example(features=tf_features)
-    tf_serialized = example.SerializeToString()
-    return tf_serialized
+    return feature
 
 def RecorderMessage(item):
     """Read image and convert it to serialized string.
     Args:
-        item(list): the message list format is [`image_path`, `label`].
-                    e.g. ['/data/dogs_vs_cats/train/dogs/001.jpg', 1]
-
+        item(list): 
     Returns:
         tf_serialized_string: The item tfrecord string.
     """
-    image_path, label = item[0], item[1]
-    assert isinstance(image_path, str)
-    assert isinstance(label, int)
-
-    image = image_read(image_path)
-    image = resize_shorter_edge(image, size=250)
-
-    tf_serialized_string = tfrecord_string(image, label)
-    print("Get the {} serialized string.".format(image_path))
-
+    feature = MessageProcess(item)
+    tf_serialized_string = _tfrecord_string(feature)
     return tf_serialized_string
+
+
 
 def RecordMaker(item_lst, writer_path, num_processes=5):
     """
@@ -101,7 +95,7 @@ def RecordMaker(item_lst, writer_path, num_processes=5):
     writer.close()
 
 if __name__ == "__main__":
-    ROOT_DIR = "/home/loktarxiao/Datasets/dogs_vs_cats/"
+    ROOT_DIR = "/home/loktar/Datasets/dogs_vs_cats/"
     train_lst = []
     valid_lst = []
     with open(os.path.join("./", "message_lst.csv")) as fp:
