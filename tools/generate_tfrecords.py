@@ -8,14 +8,8 @@ Created on Mon Sep  2 11:24:34 2019
 import sys
 sys.dont_write_bytecode = True
 
-import os
-import cv2
-import random
-
 from multiprocessing import Pool
-from glob import glob
 from tqdm import tqdm
-
 import numpy as np
 import tensorflow as tf
 
@@ -26,7 +20,6 @@ def _int64_feature(value):
     """Conver integer data to a string which is accepted by tensorflow record.
     """
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
-
 
 def _bytes_feature(value):
     """Conver byte data to a string which is accepted by tensorflow record.
@@ -44,6 +37,8 @@ def _tfrecord_string(feature):
     example = tf.train.Example(features=tf_features)
     tf_serialized = example.SerializeToString()
     return tf_serialized
+
+
 
 def MessageProcess(item):
     image_path, label = item[0], item[1]
@@ -68,20 +63,14 @@ def RecorderMessage(item):
     tf_serialized_string = _tfrecord_string(feature)
     return tf_serialized_string
 
-
-
 def RecordMaker(item_lst, writer_path, num_processes=5):
     """
     """
     writer = tf.io.TFRecordWriter(writer_path)
-
-    from multiprocessing import Pool
     pool = Pool(processes=num_processes)
     results = []
-
     for item in item_lst[:]:
         results.append(pool.apply_async(RecorderMessage, args=(item,)))
-
     pool.close()
     pool.join()
 
@@ -89,12 +78,11 @@ def RecordMaker(item_lst, writer_path, num_processes=5):
     print("[WAITING] ......")
     for result in tqdm(results):
         writer.write(result.get())
-
     print("[INFO] Tasks has been completed.")
-
     writer.close()
 
 if __name__ == "__main__":
+    import os
     ROOT_DIR = "/home/loktar/Datasets/dogs_vs_cats/"
     train_lst = []
     valid_lst = []
