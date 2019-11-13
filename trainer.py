@@ -21,8 +21,6 @@ class Trainer(object):
         self.mets = metrics
         self.opts = optimizers
 
-        self.train_variables = self.model.trainable_variables
-
     def _compile(self):
         """
         """
@@ -34,7 +32,7 @@ class Trainer(object):
         """
         """
         self.model.fit(self.train_ds, 
-                       epochs=self.cfgs.EPOCHS,
+                       epochs=self.cfgs.num_epochs,
                        validation_data=self.valid_ds)
     
     """

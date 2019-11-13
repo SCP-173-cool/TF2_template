@@ -8,5 +8,6 @@ Created on Mon Sep  2 11:24:34 2019
 import sys
 sys.dont_write_bytecode = True
 
-class MNIST_config(object):
-    EPOCHS = 5
+class base_config(object):
+    
+    num_epochs = 5

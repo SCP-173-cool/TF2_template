@@ -45,21 +45,21 @@ def dataset_from_tfrcord(tfrecord_lst, num_processors=8):
 @tf.function
 def train_process_func(image, label):
 
+    image = tf.cast(image, tf.float32) / 255.
     image = tf.image.random_crop(image, size=[224, 224, 3])
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_hue(image, 0.5)
     image = tf.image.random_saturation(image, 0.1, 1.6)
-    image = tf.cast(image, tf.float32)
-    image = (image - 127.5) / 255.
+    image = tf.image.random_contrast(image, 0.2, 1.3)
+    image = tf.image.random_brightness(image, 0.2)
+    image = tf.image.random_jpeg_quality(image, 40, 100)
     return image, label
 
 @tf.function
 def valid_process_func(image, label):
-
+    image = tf.cast(image, tf.float32) / 255.
     image = tf.image.resize_with_crop_or_pad(image, 224, 224)
-    image = tf.cast(image, tf.float32)
-    image = (image - 127.5) / 255.
     return image, label
 
 def data_loader(tfrecord_lst,
@@ -116,13 +116,13 @@ if __name__ == "__main__":
                            num_processors=8)
 
     for images, labels in tqdm(train_ds):
-        pass
+        break
 
     images = images.numpy()
     print(images.shape)
 
     import matplotlib.pyplot as plt
-    images = (images + 1) / 2.
+    #images = (images + 1) / 2.
     for i in range(len(images)):
         image = images[i]
         plt.imshow(image)

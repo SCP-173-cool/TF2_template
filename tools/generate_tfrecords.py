@@ -13,7 +13,7 @@ from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 
-from img_utils import image_read, resize_shorter_edge
+from tool_utils import image_read, resize_shorter_edge
 
 
 def _int64_feature(value):
@@ -41,6 +41,8 @@ def _tfrecord_string(feature):
 
 
 def MessageProcess(item):
+    """ Custom function of the message process 
+    """
     image_path, label = item[0], item[1]
     image = image_read(image_path)
     image = resize_shorter_edge(image, size=250)
@@ -69,7 +71,7 @@ def RecordMaker(item_lst, writer_path, num_processes=5):
     writer = tf.io.TFRecordWriter(writer_path)
     pool = Pool(processes=num_processes)
     results = []
-    for item in item_lst[:]:
+    for item in item_lst[:100]:
         results.append(pool.apply_async(RecorderMessage, args=(item,)))
     pool.close()
     pool.join()

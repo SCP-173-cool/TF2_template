@@ -10,7 +10,7 @@ sys.dont_write_bytecode = True
 
 from optimizer import Optimizers
 from model import MyModel, ResNet34
-from config import MNIST_config
+from config import base_config
 from metric import Metrics
 from trainer import Trainer
 from data import All_datasets
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     
     model       = ResNet34(input_shape=[224, 224, 3], num_classes=2, include_top=True)
     datasets    = All_datasets
-    config      = MNIST_config()
+    config      = base_config()
     metrics     = Metrics()
     optimizers  = Optimizers()
     trainer     = Trainer(datasets, model, config, metrics, optimizers)

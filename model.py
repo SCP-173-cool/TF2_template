@@ -75,7 +75,7 @@ def residual_block(input_tensor, block_type, n_filters):
     return x
 
 
-def ResNet34(input_shape=[None, None, 3], num_classes=1000, include_top=True):
+def ResNet34(input_shape=[None, None, 3], num_classes=2, include_top=True):
     input_tensor = tf.keras.layers.Input(shape=input_shape)
     x = tf.keras.layers.Conv2D(filters=64,
                                kernel_size=7,
