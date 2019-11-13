@@ -8,9 +8,6 @@ Created on Mon Sep  2 11:24:34 2019
 import sys
 sys.dont_write_bytecode = True
 
-import tensorflow as tf
-import numpy as np
-
 from optimizer import Optimizers
 from model import MyModel, ResNet34
 from config import MNIST_config
