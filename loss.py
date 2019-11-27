@@ -11,8 +11,8 @@ sys.dont_write_bytecode = True
 
 import tensorflow as tf
 
-class Metrics(object):
-    
-    accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="accuracy")
-
-    METRICS_LST = [accuracy]
+def get_loss_function():
+    """
+    """
+    loss_func = tf.keras.losses.SparseCategoricalCrossentropy()
+    return loss_func

@@ -11,12 +11,11 @@ sys.dont_write_bytecode = True
 
 import tensorflow as tf
 
+def get_optimizer():
+    """
+    """
+    optimizer = tf.keras.optimizers.SGD()
+    return optimizer
 
-class Optimizers(object):
-    """
-    """
-    def __init__(self,):
-        self.LOSS_FUNC = tf.keras.losses.SparseCategoricalCrossentropy()
-        self.OPTIMIZER = tf.keras.optimizers.Adam()
 
         

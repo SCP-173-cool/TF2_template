@@ -13,6 +13,16 @@ from tensorflow.keras import Model
 
 import tensorflow as tf
 
+def get_model(cfg):
+    """
+    """
+    strategy = tf.distribute.MirroredStrategy()
+    cfg.STRATEGY = strategy
+    print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+    with strategy.scope():
+        model = ResNet34(input_shape=cfg.input_shape, num_classes=cfg.num_classes, include_top=True)
+        
+    return model
 
 class MyModel(Model):
     """

@@ -8,21 +8,29 @@ Created on Mon Sep  2 11:24:34 2019
 import sys
 sys.dont_write_bytecode = True
 
-from optimizer import Optimizers
-from model import MyModel, ResNet34
 from config import base_config
-from metric import Metrics
+
+from optimizer import get_optimizer
+from loss import get_loss_function
+from model import get_model
+from metrics import get_metrics_lst
+from callback import get_callbacks
 from trainer import Trainer
-from data import All_datasets
+from data import get_datasets
 
 if __name__ == "__main__":
     
-    model       = ResNet34(input_shape=[224, 224, 3], num_classes=2, include_top=True)
-    datasets    = All_datasets
-    config      = base_config()
-    metrics     = Metrics()
-    optimizers  = Optimizers()
-    trainer     = Trainer(datasets, model, config, metrics, optimizers)
+    config = base_config()
+    config.METRICS_LST = get_metrics_lst()
+    config.OPTIMIZER = get_optimizer()
+    config.LOSS_FUNC = get_loss_function()
+    config.CALLBACK_LST = get_callbacks(config)
+    
+    config.display()
+
+    model       = get_model(config)
+    datasets    = get_datasets(config)
+    trainer     = Trainer(datasets, model, config)
 
     trainer._compile()
     trainer.train()

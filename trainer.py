@@ -14,26 +14,28 @@ from tqdm import tqdm
 class Trainer(object):
     """
     """
-    def __init__(self, datasets, model, config, metrics, optimizers):
+    def __init__(self, datasets, model, config):
         self.train_ds, self.valid_ds = datasets
         self.model = model
-        self.cfgs = config
-        self.mets = metrics
-        self.opts = optimizers
+        self.cfg = config
 
     def _compile(self):
         """
         """
-        self.model.compile(optimizer=self.opts.OPTIMIZER,
-                           loss=self.opts.LOSS_FUNC,
-                           metrics=self.mets.METRICS_LST)
+        with self.cfg.STRATEGY.scope():
+            self.model.compile(optimizer=self.cfg.OPTIMIZER,
+                               loss=self.cfg.LOSS_FUNC,
+                               metrics=self.cfg.METRICS_LST)
     
     def train(self):
         """
         """
-        self.model.fit(self.train_ds, 
-                       epochs=self.cfgs.num_epochs,
-                       validation_data=self.valid_ds)
+        self.model.fit(self.train_ds.repeat(),
+                       validation_data=self.valid_ds.repeat(),
+                       epochs=self.cfg.NUM_EPOCHS,
+                       steps_per_epoch=self.cfg.TRAIN_STEP,
+                       validation_steps=self.cfg.VALID_STEP,
+                       callbacks=self.cfg.CALLBACK_LST)
     
     """
     #@tf.function

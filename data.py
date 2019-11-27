@@ -16,14 +16,14 @@ def _parse_function(example_proto):
     """
     dics = {
         'image': tf.io.FixedLenFeature([], dtype=tf.string),
-        'image_shape': tf.io.FixedLenFeature(shape=(3, ), dtype=tf.int64),
-        'label': tf.io.FixedLenFeature([], dtype=tf.int64),
+        'label1': tf.io.FixedLenFeature([], dtype=tf.int64),
+        'label2': tf.io.FixedLenFeature([], dtype=tf.int64)
     }
     parsed_example = tf.io.parse_single_example(example_proto, features=dics)
 
     image = tf.reshape(tf.io.decode_raw(
-        parsed_example['image'], tf.uint8), parsed_example['image_shape'])
-    label = parsed_example['label']
+        parsed_example['image'], tf.uint8), (224, 224, 3))
+    label = parsed_example['label1']
 
     image = tf.cast(image, tf.uint8)
     label = tf.cast(label, tf.float32)
@@ -46,7 +46,7 @@ def dataset_from_tfrcord(tfrecord_lst, num_processors=8):
 def train_process_func(image, label):
 
     image = tf.cast(image, tf.float32) / 255.
-    image = tf.image.random_crop(image, size=[224, 224, 3])
+    #image = tf.image.random_crop(image, size=[224, 224, 3])
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_hue(image, 0.5)
@@ -59,7 +59,7 @@ def train_process_func(image, label):
 @tf.function
 def valid_process_func(image, label):
     image = tf.cast(image, tf.float32) / 255.
-    image = tf.image.resize_with_crop_or_pad(image, 224, 224)
+    #image = tf.image.resize_with_crop_or_pad(image, 224, 224)
     return image, label
 
 def data_loader(tfrecord_lst,
@@ -88,21 +88,22 @@ def data_loader(tfrecord_lst,
 
     return dataset
 
-train_tfrecord_lst = ['./tools/train.tfrecord']
-train_ds = data_loader(train_tfrecord_lst, 
-                        shuffle=True, 
-                        batch_size=32,
-                        process_func=train_process_func,
-                        num_processors=8)
+def get_datasets(cfg):
+    
+    
+    train_ds = data_loader(cfg.TRAIN_TFRECORD_LST, 
+                           shuffle=True, 
+                           batch_size=cfg.BATCH_SIZE,
+                           process_func=train_process_func,
+                           num_processors=cfg.num_processors)
 
-valid_tfrecord_lst = ['./tools/valid.tfrecord']
-valid_ds = data_loader(valid_tfrecord_lst, 
-                        shuffle=True, 
-                        batch_size=32,
-                        process_func=valid_process_func,
-                        num_processors=8)
-
-All_datasets = (train_ds, valid_ds)
+    valid_ds = data_loader(cfg.VALID_TFRECORD_LST, 
+                           shuffle=False, 
+                           batch_size=cfg.BATCH_SIZE,
+                           process_func=valid_process_func,
+                           num_processors=cfg.num_processors)
+    
+    return train_ds, valid_ds
 
 if __name__ == "__main__":
     """
@@ -111,9 +112,9 @@ if __name__ == "__main__":
     train_tfrecord_lst = ['./tools/train.tfrecord']
     train_ds = data_loader(train_tfrecord_lst, 
                            shuffle=True, 
-                           batch_size=12,
+                           batch_size=32,
                            process_func=train_process_func,
-                           num_processors=8)
+                           num_processors=32)
 
     for images, labels in tqdm(train_ds):
         break
